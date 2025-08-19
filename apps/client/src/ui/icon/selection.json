@@ -1,0 +1,97 @@
+{
+  "IcoMoonType": "selection",
+  "icons": [
+    {
+      "icon": {
+        "paths": [
+          "M657.493 316.16l-60.16-60.16-256 256 256 256 60.16-60.16-195.413-195.84z"
+        ],
+        "attrs": [{}],
+        "isMulticolor": false,
+        "isMulticolor2": false,
+        "grid": 0,
+        "tags": ["prev_page"]
+      },
+      "attrs": [{}],
+      "properties": {
+        "order": 5,
+        "id": 3,
+        "name": "prev_page",
+        "prevSize": 32,
+        "code": 59648
+      },
+      "setIdx": 0,
+      "setId": 2,
+      "iconIdx": 0
+    },
+    {
+      "icon": {
+        "paths": [
+          "M426.667 256l-60.16 60.16 195.413 195.84-195.413 195.84 60.16 60.16 256-256z"
+        ],
+        "attrs": [{}],
+        "isMulticolor": false,
+        "isMulticolor2": false,
+        "grid": 0,
+        "tags": ["next_page"]
+      },
+      "attrs": [{}],
+      "properties": {
+        "order": 7,
+        "id": 4,
+        "name": "next_page",
+        "prevSize": 32,
+        "code": 59648
+      },
+      "setIdx": 0,
+      "setId": 2,
+      "iconIdx": 0
+    },
+    {
+      "icon": {
+        "paths": [
+          "M238.507 316.16l195.84 195.84-195.84 195.84 60.16 60.16 256-256-256-256zM682.667 256h85.333v512h-85.333z"
+        ],
+        "attrs": [{}],
+        "isMulticolor": false,
+        "isMulticolor2": false,
+        "grid": 0,
+        "tags": ["last_page"]
+      },
+      "attrs": [{}],
+      "properties": {
+        "order": 4,
+        "id": 2,
+        "name": "last_page",
+        "prevSize": 32,
+        "code": 59648
+      },
+      "setIdx": 0,
+      "setId": 2,
+      "iconIdx": 0
+    },
+    {
+      "icon": {
+        "paths": [
+          "M785.493 707.84l-195.84-195.84 195.84-195.84-60.16-60.16-256 256 256 256zM256 256h85.333v512h-85.333z"
+        ],
+        "attrs": [{}],
+        "isMulticolor": false,
+        "isMulticolor2": false,
+        "grid": 0,
+        "tags": ["first_page"]
+      },
+      "attrs": [{}],
+      "properties": {
+        "order": 3,
+        "id": 1,
+        "name": "first_page",
+        "prevSize": 32,
+        "code": 59648
+      },
+      "setIdx": 0,
+      "setId": 2,
+      "iconIdx": 0
+    }
+  ]
+}

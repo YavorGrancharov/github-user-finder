@@ -1,0 +1,37 @@
+{
+  "name": "github-search-app",
+  "version": "1.0.0",
+  "main": "index.js",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=18",
+    "npm": ">=9"
+  },
+  "scripts": {
+    "clean": "rimraf packages/*/dist packages/*/tsconfig.tsbuildinfo apps/*/dist apps/*/tsconfig.tsbuildinfo node_modules/.cache",
+    "build:shared": "npm --workspace packages/shared run build",
+    "build:client": "npm --workspace apps/client run build",
+    "build:server": "npm --workspace apps/server run build",
+    "build": "npm run clean && npm run build:shared && npm run build:client && npm run build:server",
+    "dev:client": "npm --workspace apps/client run dev",
+    "dev:server": "npm --workspace apps/server run dev",
+    "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
+    "heroku-postbuild": "npm run build",
+    "start": "npm --workspace apps/server run start"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "concurrently": "^9.2.0",
+    "rimraf": "^6.0.1"
+  },
+  "dependencies": {
+    "shared": "workspace:*"
+  }
+}

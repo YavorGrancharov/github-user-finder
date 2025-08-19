@@ -1,0 +1,31 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "clean:shared": "rimraf ../../packages/shared/dist ../../packages/shared/tsconfig.tsbuildinfo",
+    "build:shared": "tsc -b ../../packages/shared",
+    "dev": "npm run clean:shared && npm run build:shared && nodemon --watch src --exec ts-node src/index.ts",
+    "build": "tsc -b",
+    "start": "node dist/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.0.10",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "p-limit": "^6.2.0",
+    "shared": "^1.0.0"
+  }
+}

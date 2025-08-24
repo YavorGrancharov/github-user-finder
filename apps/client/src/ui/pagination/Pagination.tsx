@@ -9,7 +9,6 @@ type PaginationProps = {
   pageSize: number;
   totalItems: number;
   onPageChange: (page: number) => void;
-  maxItems?: number;
   disabled?: boolean;
   position?: "start" | "center" | "end";
 };
@@ -17,14 +16,12 @@ type PaginationProps = {
 export const Pagination = ({
   currentPage,
   pageSize,
-  maxItems = 1000, // Github related
   totalItems,
   position = "center",
   disabled,
   onPageChange,
 }: PaginationProps) => {
-  const maxPages = Math.floor(maxItems / pageSize);
-  const totalPages = Math.min(Math.ceil(totalItems / pageSize), maxPages);
+  const totalPages = Math.ceil(totalItems / pageSize);
 
   const hasNextPage = currentPage < totalPages;
   const hasPrevPage = currentPage > 1;
@@ -38,25 +35,25 @@ export const Pagination = ({
         disabled={!hasPrevPage || disabled}
         onClick={() => onPageChange(goTo("first"))}
       >
-        <Icon icon="first_page" size={26} />
+        <Icon icon="first_page" />
       </StyledButton>
       <StyledButton
         disabled={!hasPrevPage || disabled}
         onClick={() => onPageChange(goTo("prev"))}
       >
-        <Icon icon="prev_page" size={26} />
+        <Icon icon="prev_page" />
       </StyledButton>
       <StyledButton
         disabled={!hasNextPage || disabled}
         onClick={() => onPageChange(goTo("next"))}
       >
-        <Icon icon="next_page" size={26} />
+        <Icon icon="next_page" />
       </StyledButton>
       <StyledButton
         disabled={!hasNextPage || disabled}
         onClick={() => onPageChange(goTo("last"))}
       >
-        <Icon icon="last_page" size={26} />
+        <Icon icon="last_page" />
       </StyledButton>
     </PaginationWrapper>
   );

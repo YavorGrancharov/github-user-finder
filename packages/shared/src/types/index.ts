@@ -1,4 +1,5 @@
 export type GithubUser = {
+  id: number;
   username: string;
   avatarUrl: string;
   publicReposCount: number;
@@ -6,6 +7,7 @@ export type GithubUser = {
 };
 
 export type GithubApiUser = {
+  id: number;
   login: string;
   avatar_url: string;
   html_url: string;

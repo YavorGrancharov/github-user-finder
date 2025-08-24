@@ -1,22 +1,25 @@
+import { ReactNode } from "react";
 import DataGridCell from "./GridCell";
 import { GridWrapper } from "./Grid.styles";
 
 export type GridItem = {
-  label: string;
+  id: number;
+  label: ReactNode;
   imageUrl: string;
   count: number;
+  onCellClick?: () => void;
   [key: string]: any;
 };
 
 type GridProps = {
   items: GridItem[];
-  onCellClick?: (item: GridItem) => void;
+  onClick?: (item: GridItem) => void;
 };
 
-export const Grid = ({ items, onCellClick }: GridProps) => {
+export const Grid = ({ items, onClick }: GridProps) => {
   const handleOnClick = (item: GridItem) => {
-    if (onCellClick) {
-      onCellClick(item);
+    if (onClick) {
+      onClick(item);
     }
   };
 
@@ -24,7 +27,7 @@ export const Grid = ({ items, onCellClick }: GridProps) => {
     <GridWrapper>
       {items.map((item) => (
         <DataGridCell
-          key={item.label}
+          key={item.id}
           onClick={() => handleOnClick(item)}
           label={item.label}
           imageUrl={item.imageUrl}

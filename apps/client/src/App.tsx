@@ -1,4 +1,4 @@
-import GithubUsersPage from "./pages/SearchResults";
+import GithubUsersPage from "./pages/GithubUsersPage";
 import "./App.css";
 
 function App() {

@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Badge } from "@ui";
+import Badge from "@ui/badge/Badge";
+import { GridItem } from "./Grid";
 import {
   CellWrapper,
   ImageWrapper,
@@ -7,17 +8,12 @@ import {
   StyledLabel,
 } from "./Grid.styles";
 
-type GridCellProps = {
-  label: string;
-  imageUrl: string;
-  count: number;
-  onClick?: () => void;
-};
+type GridCellProps = Omit<GridItem, "id">;
 
 export const GridCell = ({
   label,
   imageUrl,
-  onClick,
+  onCellClick,
   count,
 }: GridCellProps) => {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -25,7 +21,6 @@ export const GridCell = ({
   const Image = (
     <StyledImage
       src={imageUrl}
-      alt={label}
       loading="lazy"
       onLoad={(e) => {
         setIsLoaded(true);
@@ -35,7 +30,7 @@ export const GridCell = ({
   );
 
   return (
-    <CellWrapper onClick={onClick}>
+    <CellWrapper onClick={onCellClick}>
       <ImageWrapper>
         {count != null && count > 0 ? (
           <Badge count={isLoaded ? count : 0}>{Image}</Badge>

@@ -12,13 +12,9 @@ import {
 } from "shared";
 import { redisCache } from "./redisCache";
 import { fetchWithRetry } from "./utils";
-import {
-  CACHE_TTL_MS,
-  CIRCUIT_BREAKER_OPTIONS,
-  GITHUB_MAX_SEARCH_RESULTS,
-} from "./consts";
+import { CIRCUIT_BREAKER_OPTIONS, GITHUB_MAX_SEARCH_RESULTS } from "./consts";
 
-const repoCache = new Map<string, { expires: number; data: GithubUser }>();
+// const repoCache = new Map<string, { expires: number; data: GithubUser }>();
 const circuitBreaker = new Opossum(fetchWithRetry, CIRCUIT_BREAKER_OPTIONS);
 
 circuitBreaker.fallback(() => "Sorry, out of service right now");

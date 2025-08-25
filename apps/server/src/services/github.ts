@@ -14,13 +14,11 @@ import { redisCache } from "./redisCache";
 import { fetchWithRetry } from "./utils";
 import { CIRCUIT_BREAKER_OPTIONS, GITHUB_MAX_SEARCH_RESULTS } from "./consts";
 
-// const repoCache = new Map<string, { expires: number; data: GithubUser }>();
 const circuitBreaker = new Opossum(fetchWithRetry, CIRCUIT_BREAKER_OPTIONS);
 
 circuitBreaker.fallback(() => "Sorry, out of service right now");
 
 const getGithubUserRepos = async (user: GithubApiUser): Promise<GithubUser> => {
-  // const cacheKey = `${user.login}-repos`;
   const cacheKey = `github:user:${user.login}:repos`;
 
   const cachedData = await redisCache.get(cacheKey);
@@ -31,11 +29,6 @@ const getGithubUserRepos = async (user: GithubApiUser): Promise<GithubUser> => {
   }
 
   console.log("Cache miss for:", user.login);
-
-  // const cache = repoCache.get(cacheKey);
-  // if (cache && cache.expires > Date.now()) {
-  //   return cache.data;
-  // }
 
   const NEXT_PAGE_PATTERN = /<([^>]*)>; rel="next"/i;
 
@@ -98,11 +91,6 @@ const getGithubUserRepos = async (user: GithubApiUser): Promise<GithubUser> => {
 
     await redisCache.set(cacheKey, result);
 
-    // repoCache.set(cacheKey, {
-    //   expires: Date.now() + CACHE_TTL_MS,
-    //   data: result,
-    // });
-
     return result;
   } catch (err) {
     console.error(`Error fetching repos for ${user.login}:`, err);
@@ -130,6 +118,14 @@ export const getGithubUsersList = async (
     Math.max(params.pageSize ?? DEFAULT_PAGE_SIZE, 1),
     100
   );
+
+  const cacheKey = `github:users:${search}:${page}:${pageSize}`;
+  const cachedData = await redisCache.get(cacheKey);
+
+  if (cachedData) {
+    console.log("Cache hit for:", cacheKey);
+    return cachedData;
+  }
 
   const searchUsersUrl = new URL("/search/users", GITHUB_BASE_URL);
   searchUsersUrl.searchParams.set("per_page", pageSize.toString());
@@ -166,6 +162,11 @@ export const getGithubUsersList = async (
       githubSearchResults.total_count,
       GITHUB_MAX_SEARCH_RESULTS
     );
+
+    await redisCache.set(cacheKey, {
+      total: limitedTotal,
+      items: users,
+    });
 
     return {
       total: limitedTotal,

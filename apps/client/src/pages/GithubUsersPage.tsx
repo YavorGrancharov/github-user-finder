@@ -6,7 +6,7 @@ import {
 } from "@tanstack/react-query";
 import { DEFAULT_PAGE_SIZE } from "shared";
 import Search from "@components/Search/Search";
-import UsersList from "@components/List/List";
+import DataGrid from "@components/DataGrid/DataGrid";
 import { useDebounceValue } from "@hooks/useDebounce";
 import { fetchGithubUsers } from "@api/github";
 import { openInNewTab } from "./utils";
@@ -94,7 +94,7 @@ export const GithubUsersPage = () => {
       <SearchContainer>
         <Search onSearch={onSearch} />
       </SearchContainer>
-      <UsersList
+      <DataGrid
         searchTerm={debouncedSearch}
         currentPage={currentPage}
         items={renderItems}

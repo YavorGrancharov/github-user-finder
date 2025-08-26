@@ -31,7 +31,7 @@ export const List = ({
       <InfoContainer>
         {getInfoMessage(isLoading, !!items?.length, !!searchTerm)}
       </InfoContainer>
-      <Grid items={items} onCellClick={(item) => onItemClick(item)} />
+      <Grid items={items} onClick={(item) => onItemClick(item)} />
       {items && totalItems > DEFAULT_PAGE_SIZE && (
         <Pagination
           currentPage={currentPage}

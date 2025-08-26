@@ -1,4 +1,5 @@
 import pLimit from "p-limit";
+import Opossum from "opossum";
 import {
   GithubUsersRequest,
   GithubUsersResponse,
@@ -9,20 +10,25 @@ import {
   GITHUB_BASE_URL,
   USER_CONCURRENCY_LIMIT,
 } from "shared";
-import {
-  CACHE_TTL_MS,
-  fetchWithTimeout,
-  getRequestHeaders,
-  repoCache,
-} from "./utils";
+import { redis } from "./redis";
+import { fetchWithRetry } from "./utils";
+import { CIRCUIT_BREAKER_OPTIONS, GITHUB_MAX_SEARCH_RESULTS } from "./consts";
+
+const circuitBreaker = new Opossum(fetchWithRetry, CIRCUIT_BREAKER_OPTIONS);
+
+circuitBreaker.fallback(() => "Sorry, out of service right now");
 
 const getGithubUserRepos = async (user: GithubApiUser): Promise<GithubUser> => {
-  const cacheKey = `${user.login}-repos`;
+  const cacheKey = `github:user:${user.login}:repos`;
 
-  const cache = repoCache.get(cacheKey);
-  if (cache && cache.expires > Date.now()) {
-    return cache.data;
+  const cachedData = await redis.get(cacheKey);
+
+  if (cachedData) {
+    console.log("Cache hit for:", user.login);
+    return cachedData;
   }
+
+  console.log("Cache miss for:", user.login);
 
   const NEXT_PAGE_PATTERN = /<([^>]*)>; rel="next"/i;
 
@@ -34,9 +40,12 @@ const getGithubUserRepos = async (user: GithubApiUser): Promise<GithubUser> => {
 
   try {
     while (hasNextPage) {
-      const userReposResponse = await fetchWithTimeout(userGithubReposUrl, {
-        headers: getRequestHeaders(),
-      });
+      const userReposResponse = await circuitBreaker.fire(
+        userGithubReposUrl,
+        undefined,
+        undefined,
+        { method: "GET" }
+      );
 
       if (!userReposResponse.ok) {
         const errorText = await userReposResponse.text();
@@ -72,17 +81,15 @@ const getGithubUserRepos = async (user: GithubApiUser): Promise<GithubUser> => {
       return count;
     }, 0);
 
-    const result = {
+    const result: GithubUser = {
+      id: user.id,
       username: user.login,
       avatarUrl: user.avatar_url,
       publicReposCount: userPublicReposCount,
       githubProfileUrl: user.html_url,
     };
 
-    repoCache.set(cacheKey, {
-      expires: Date.now() + CACHE_TTL_MS,
-      data: result,
-    });
+    await redis.set(cacheKey, result);
 
     return result;
   } catch (err) {
@@ -109,8 +116,16 @@ export const getGithubUsersList = async (
 
   const pageSize = Math.min(
     Math.max(params.pageSize ?? DEFAULT_PAGE_SIZE, 1),
-    30
+    100
   );
+
+  const cacheKey = `github:users:${search}:${page}:${pageSize}`;
+  const cachedData = await redis.get(cacheKey);
+
+  if (cachedData) {
+    console.log("Cache hit for:", cacheKey);
+    return cachedData;
+  }
 
   const searchUsersUrl = new URL("/search/users", GITHUB_BASE_URL);
   searchUsersUrl.searchParams.set("per_page", pageSize.toString());
@@ -118,11 +133,11 @@ export const getGithubUsersList = async (
   searchUsersUrl.searchParams.set("q", `${search} type:user`);
 
   try {
-    const githubSearchRequest = await fetchWithTimeout(
+    const githubSearchRequest = await circuitBreaker.fire(
       searchUsersUrl.toString(),
-      {
-        headers: getRequestHeaders(),
-      }
+      undefined,
+      undefined,
+      { method: "GET" }
     );
 
     if (!githubSearchRequest.ok) {
@@ -143,8 +158,18 @@ export const getGithubUsersList = async (
       )
     );
 
+    const limitedTotal = Math.min(
+      githubSearchResults.total_count,
+      GITHUB_MAX_SEARCH_RESULTS
+    );
+
+    await redis.set(cacheKey, {
+      total: limitedTotal,
+      items: users,
+    });
+
     return {
-      total: githubSearchResults.total_count,
+      total: limitedTotal,
       items: users,
     };
   } catch (err) {

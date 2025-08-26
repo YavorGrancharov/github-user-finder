@@ -4,21 +4,22 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { DEFAULT_PAGE_SIZE, GithubUser } from "shared";
+import { DEFAULT_PAGE_SIZE } from "shared";
 import Search from "@components/Search/Search";
 import UsersList from "@components/List/List";
 import { useDebounceValue } from "@hooks/useDebounce";
 import { fetchGithubUsers } from "@api/github";
 import { openInNewTab } from "./utils";
+import { renderCells } from "./RenderCells";
 import {
   SearchContainer,
   MainContainer,
   MainTitle,
-} from "./SearchResults.styles";
+} from "./GithubUsersPage.styles";
 
 const SEARCH_RESULTS_QUERY_KEY = "search-results";
 
-export const SearchResults = () => {
+export const GithubUsersPage = () => {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -35,17 +36,14 @@ export const SearchResults = () => {
       }),
     enabled: debouncedSearch.trim().length > 0,
     placeholderData: keepPreviousData,
+    refetchOnMount: true,
+    refetchOnReconnect: true,
+    refetchOnWindowFocus: false,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   });
 
-  const renderItems =
-    data?.items?.map((item: GithubUser) => ({
-      label: item.username,
-      imageUrl: item.avatarUrl,
-      count: item.publicReposCount,
-      profileUrl: item.githubProfileUrl,
-    })) || [];
+  const renderItems = renderCells(data?.items || [], search);
 
   const clearResults = () => {
     queryClient.cancelQueries({ queryKey: [SEARCH_RESULTS_QUERY_KEY] });
@@ -109,4 +107,4 @@ export const SearchResults = () => {
   );
 };
 
-export default SearchResults;
+export default GithubUsersPage;

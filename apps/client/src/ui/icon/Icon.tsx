@@ -5,12 +5,12 @@ export type IconValue = "prev_page" | "next_page" | "last_page" | "first_page";
 
 export type IconProps = {
   icon: IconValue;
-  size: number;
+  size?: number;
   color?: string;
   className?: string;
 };
 
-export const Icon = ({ icon, size = 24, className, ...rest }: IconProps) => {
+export const Icon = ({ icon, size = 26, className, ...rest }: IconProps) => {
   return (
     <IcomoonReact
       {...rest}

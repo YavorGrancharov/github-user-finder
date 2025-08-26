@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import DataGridCell from "./GridCell";
+import GridCell from "./GridCell";
 import { GridWrapper } from "./Grid.styles";
 
 export type GridItem = {
@@ -26,7 +26,7 @@ export const Grid = ({ items, onClick }: GridProps) => {
   return (
     <GridWrapper>
       {items.map((item) => (
-        <DataGridCell
+        <GridCell
           key={item.id}
           onClick={() => handleOnClick(item)}
           label={item.label}

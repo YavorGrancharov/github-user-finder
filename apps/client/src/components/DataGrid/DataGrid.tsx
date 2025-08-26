@@ -1,9 +1,9 @@
 import { DEFAULT_PAGE_SIZE } from "shared";
 import { Grid, GridItem, Pagination } from "@ui";
 import { getInfoMessage } from "./utils";
-import { InfoContainer } from "./List.styles";
+import { InfoContainer } from "./DataGrid.styles";
 
-type ListProps = {
+type DataGridProps = {
   searchTerm: string;
   currentPage: number;
   items: GridItem[];
@@ -11,9 +11,10 @@ type ListProps = {
   isLoading: boolean;
   onPageChange: (page: number) => void;
   onItemClick: (item: GridItem) => void;
+  withMessage?: boolean;
 };
 
-export const List = ({
+export const DataGrid = ({
   searchTerm,
   currentPage,
   items,
@@ -21,16 +22,19 @@ export const List = ({
   isLoading,
   onPageChange,
   onItemClick,
-}: ListProps) => {
+  withMessage = true,
+}: DataGridProps) => {
   const handlePageChange = (page: number) => {
     onPageChange(page);
   };
 
   return (
     <>
-      <InfoContainer>
-        {getInfoMessage(isLoading, !!items?.length, !!searchTerm)}
-      </InfoContainer>
+      {withMessage && (
+        <InfoContainer>
+          {getInfoMessage(isLoading, !!items?.length, !!searchTerm)}
+        </InfoContainer>
+      )}
       <Grid items={items} onClick={(item) => onItemClick(item)} />
       {items && totalItems > DEFAULT_PAGE_SIZE && (
         <Pagination
@@ -45,4 +49,4 @@ export const List = ({
   );
 };
 
-export default List;
+export default DataGrid;

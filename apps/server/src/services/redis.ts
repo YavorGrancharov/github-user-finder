@@ -1,7 +1,7 @@
-import redisClient from "../lib/redis";
+import redisClient from "../lib/redisClient";
 import { CACHE_TTL_MS } from "./consts";
 
-export const redisCache = {
+export const redis = {
   get: async (key: string) => {
     try {
       const data = await redisClient.get(key);

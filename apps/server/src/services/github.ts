@@ -10,7 +10,7 @@ import {
   GITHUB_BASE_URL,
   USER_CONCURRENCY_LIMIT,
 } from "shared";
-import { redisCache } from "./redisCache";
+import { redis } from "./redis";
 import { fetchWithRetry } from "./utils";
 import { CIRCUIT_BREAKER_OPTIONS, GITHUB_MAX_SEARCH_RESULTS } from "./consts";
 
@@ -21,7 +21,7 @@ circuitBreaker.fallback(() => "Sorry, out of service right now");
 const getGithubUserRepos = async (user: GithubApiUser): Promise<GithubUser> => {
   const cacheKey = `github:user:${user.login}:repos`;
 
-  const cachedData = await redisCache.get(cacheKey);
+  const cachedData = await redis.get(cacheKey);
 
   if (cachedData) {
     console.log("Cache hit for:", user.login);
@@ -89,7 +89,7 @@ const getGithubUserRepos = async (user: GithubApiUser): Promise<GithubUser> => {
       githubProfileUrl: user.html_url,
     };
 
-    await redisCache.set(cacheKey, result);
+    await redis.set(cacheKey, result);
 
     return result;
   } catch (err) {
@@ -120,7 +120,7 @@ export const getGithubUsersList = async (
   );
 
   const cacheKey = `github:users:${search}:${page}:${pageSize}`;
-  const cachedData = await redisCache.get(cacheKey);
+  const cachedData = await redis.get(cacheKey);
 
   if (cachedData) {
     console.log("Cache hit for:", cacheKey);
@@ -163,7 +163,7 @@ export const getGithubUsersList = async (
       GITHUB_MAX_SEARCH_RESULTS
     );
 
-    await redisCache.set(cacheKey, {
+    await redis.set(cacheKey, {
       total: limitedTotal,
       items: users,
     });

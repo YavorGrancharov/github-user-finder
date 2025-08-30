@@ -1,9 +1,10 @@
+import { ReactNode } from "react";
 import GridCell from "./GridCell";
 import { GridWrapper } from "./Grid.styles";
 
 export type GridItem = {
   id: number;
-  label: React.ReactNode;
+  label: ReactNode;
   imageUrl: string;
   count?: number;
   [key: string]: any;

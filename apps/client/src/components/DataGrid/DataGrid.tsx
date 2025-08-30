@@ -1,5 +1,5 @@
 import { DEFAULT_PAGE_SIZE } from "shared";
-import { Grid, GridItem, Pagination } from "@ui";
+import { Grid, Pagination, GridItem } from "@ui";
 import { getInfoMessage } from "./utils";
 import { InfoContainer } from "./DataGrid.styles";
 

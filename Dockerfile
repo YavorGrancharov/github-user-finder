@@ -8,7 +8,7 @@ COPY apps/server/package*.json ./apps/server/
 COPY apps/client/package*.json ./apps/client/
 COPY packages/shared/package*.json ./packages/shared/
 
-RUN npm install --include=dev
+RUN npm install --include=dev --legacy-peer-deps
 
 COPY . .
 
@@ -22,7 +22,7 @@ COPY package*.json ./
 COPY apps/server/package*.json ./apps/server/
 COPY packages/shared/package*.json ./packages/shared/
 
-RUN npm install --omit=dev
+RUN npm install --omit=dev --legacy-peer-deps
 
 COPY --from=builder /app/packages/shared/dist ./packages/shared/dist
 COPY --from=builder /app/apps/server/dist ./apps/server/dist

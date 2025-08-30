@@ -1,13 +1,11 @@
-import { ReactNode } from "react";
 import GridCell from "./GridCell";
 import { GridWrapper } from "./Grid.styles";
 
 export type GridItem = {
   id: number;
-  label: ReactNode;
+  label: React.ReactNode;
   imageUrl: string;
-  count: number;
-  onCellClick?: () => void;
+  count?: number;
   [key: string]: any;
 };
 
@@ -28,10 +26,10 @@ export const Grid = ({ items, onClick }: GridProps) => {
       {items.map((item) => (
         <GridCell
           key={item.id}
-          onClick={() => handleOnClick(item)}
+          onCellClick={() => handleOnClick(item)}
           label={item.label}
           imageUrl={item.imageUrl}
-          count={item.count}
+          count={item.count ?? 0}
         />
       ))}
     </GridWrapper>

@@ -15,6 +15,9 @@ services:
     networks:
       - app-network
       - monitor-net
+    volumes:
+      - ./apps/server:/usr/src/app
+      - /usr/src/app/node_modules 
 
   redis:
     image: redis:7-alpine

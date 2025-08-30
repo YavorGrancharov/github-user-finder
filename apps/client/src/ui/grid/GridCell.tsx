@@ -8,7 +8,9 @@ import {
   StyledLabel,
 } from "./Grid.styles";
 
-type GridCellProps = Omit<GridItem, "id">;
+type GridCellProps = Omit<GridItem, "id"> & {
+  onCellClick: () => void;
+};
 
 export const GridCell = ({
   label,

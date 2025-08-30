@@ -1,10 +1,10 @@
-import React from "react";
+import { ReactNode } from "react";
 import { BadgeWrapper, Container } from "./Badge.styles";
 
 type BadgeProps = {
   count: number;
   maxCount?: number;
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
 } & React.HTMLAttributes<HTMLDivElement>;
 

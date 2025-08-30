@@ -16,7 +16,6 @@ router.get(
     res: Response
   ): Promise<void> => {
     try {
-    
       const { pageSize, search, page } = req.query;
 
       if (!pageSize || !page) {

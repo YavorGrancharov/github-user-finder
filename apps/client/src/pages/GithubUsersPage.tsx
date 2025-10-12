@@ -1,14 +1,27 @@
-import { useEffect, useState } from "react";
-import {
-  keepPreviousData,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useEffect } from "react";
 import { DEFAULT_PAGE_SIZE } from "shared";
 import Search from "@components/Search/Search";
 import DataGrid from "@components/DataGrid/DataGrid";
 import { useDebounceValue } from "@hooks/useDebounce";
-import { fetchGithubUsers } from "@api/github";
+import {
+  useFetchGithubUsersQuery,
+  usePrefetch,
+  // updateQueryData,
+} from "@store/api/githubApi";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import {
+  setSearch,
+  setCurrentPage,
+  setGithubUsers,
+  resetSearch,
+  clearResults,
+} from "../store/slices/githubUsersSlice";
+import {
+  currentPageSelector,
+  githubUsersSelector,
+  githubUsersTotalSelector,
+  searchUsersSelector,
+} from "../store/selectors/githubUsersSelectors";
 import { openInNewTab } from "./utils";
 import { renderCells } from "./RenderCells";
 import {
@@ -17,76 +30,82 @@ import {
   MainTitle,
 } from "./GithubUsersPage.styles";
 
-const SEARCH_RESULTS_QUERY_KEY = "search-results";
+const SEARCH_RESULTS_QUERY_KEY = "fetchGithubUsers";
 
 export const GithubUsersPage = () => {
-  const queryClient = useQueryClient();
-  const [search, setSearch] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
+  const search = useAppSelector(searchUsersSelector);
+  const currentPage = useAppSelector(currentPageSelector);
+  const items = useAppSelector(githubUsersSelector);
+  const totalItems = useAppSelector(githubUsersTotalSelector);
+
+  const dispatch = useAppDispatch();
+
+  const prefetchGithubUsers = usePrefetch(SEARCH_RESULTS_QUERY_KEY);
 
   const debouncedSearch = useDebounceValue(search, 1000);
 
-  const { data, isFetching } = useQuery({
-    queryKey: [SEARCH_RESULTS_QUERY_KEY, debouncedSearch, currentPage],
-    queryFn: () =>
-      fetchGithubUsers({
-        pageSize: DEFAULT_PAGE_SIZE,
-        search: debouncedSearch,
-        page: currentPage,
-      }),
-    enabled: debouncedSearch.trim().length > 0,
-    placeholderData: keepPreviousData,
-    refetchOnMount: true,
-    refetchOnReconnect: true,
-    refetchOnWindowFocus: false,
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
-  });
+  const shouldFetch = !!debouncedSearch.trim();
 
-  const renderItems = renderCells(data?.items || [], search);
+  const { data: queryData, isFetching } = useFetchGithubUsersQuery(
+    {
+      pageSize: DEFAULT_PAGE_SIZE,
+      search: debouncedSearch,
+      page: currentPage,
+    },
+    {
+      skip: !shouldFetch,
+    }
+  );
 
-  const clearResults = () => {
-    queryClient.cancelQueries({ queryKey: [SEARCH_RESULTS_QUERY_KEY] });
-    queryClient.setQueryData([SEARCH_RESULTS_QUERY_KEY, "", 1], {
-      items: [],
-      total: 0,
-    });
-  };
+  const renderItems = renderCells(items || [], search);
 
   const onSearch = (term: string) => {
-    setCurrentPage(1);
-    setSearch(term);
-
     if (!term.trim()) {
-      clearResults();
+      dispatch(resetSearch());
+      return;
     }
+    dispatch(setSearch(term));
+  };
+
+  const onPageChange = (page: number) => {
+    dispatch(setCurrentPage(page));
   };
 
   useEffect(() => {
-    if (!debouncedSearch.trim()) return;
+    dispatch(
+      setGithubUsers({
+        items: queryData?.items || [],
+        total: queryData?.total || 0,
+      })
+    );
+  }, [dispatch, queryData]);
 
-    const totalPages = Math.ceil((data?.total || 0) / DEFAULT_PAGE_SIZE);
+  useEffect(() => {
+    if (!shouldFetch) return;
+
+    const totalPages = Math.ceil((totalItems || 0) / DEFAULT_PAGE_SIZE);
     if (currentPage >= totalPages) return;
 
     const nextPage = currentPage + 1;
-    const nextPageQueryKey = [
-      SEARCH_RESULTS_QUERY_KEY,
-      debouncedSearch,
-      nextPage,
-    ];
 
-    if (!queryClient.getQueryData(nextPageQueryKey)) {
-      queryClient.prefetchQuery({
-        queryKey: nextPageQueryKey,
-        queryFn: () =>
-          fetchGithubUsers({
-            pageSize: DEFAULT_PAGE_SIZE,
-            search: debouncedSearch,
-            page: nextPage,
-          }),
-      });
+    prefetchGithubUsers({
+      pageSize: DEFAULT_PAGE_SIZE,
+      search: debouncedSearch,
+      page: nextPage,
+    });
+  }, [
+    currentPage,
+    totalItems,
+    shouldFetch,
+    prefetchGithubUsers,
+    debouncedSearch,
+  ]);
+
+  useEffect(() => {
+    if (!shouldFetch) {
+      dispatch(clearResults());
     }
-  }, [currentPage, data?.total, debouncedSearch, queryClient]);
+  }, [dispatch, shouldFetch]);
 
   return (
     <MainContainer>
@@ -99,8 +118,8 @@ export const GithubUsersPage = () => {
         currentPage={currentPage}
         items={renderItems}
         isLoading={isFetching}
-        totalItems={data?.total || 0}
-        onPageChange={setCurrentPage}
+        totalItems={totalItems || 0}
+        onPageChange={onPageChange}
         onItemClick={(item) => openInNewTab(item.profileUrl)}
       />
     </MainContainer>

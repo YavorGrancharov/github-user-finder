@@ -55,6 +55,7 @@ export const Pagination = ({
       >
         <Icon icon="last_page" />
       </StyledButton>
+      Total items: {totalItems}
     </PaginationWrapper>
   );
 };

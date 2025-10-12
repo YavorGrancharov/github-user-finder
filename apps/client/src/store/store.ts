@@ -9,7 +9,7 @@ const githubApiMiddleware = githubApi.middleware;
 
 const store = configureStore({
   reducer: {
-    githubUsersResult: githubUsersReducer,
+    githubUsers: githubUsersReducer,
     [githubApiReducerPath]: githubApiReducer,
   },
   middleware: (getDefaultMiddleware) =>

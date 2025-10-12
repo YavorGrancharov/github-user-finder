@@ -1,13 +1,13 @@
 import { RootState } from "../store";
 
 export const searchUsersSelector = (state: RootState) =>
-  state.githubUsersResult.search;
+  state.githubUsers.search;
 
 export const currentPageSelector = (state: RootState) =>
-  state.githubUsersResult.currentPage;
+  state.githubUsers.currentPage;
 
 export const githubUsersSelector = (state: RootState) =>
-  state.githubUsersResult.items;
+  state.githubUsers.items;
 
 export const githubUsersTotalSelector = (state: RootState) =>
-  state.githubUsersResult.total;
+  state.githubUsers.total;

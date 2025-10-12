@@ -3,11 +3,7 @@ import { DEFAULT_PAGE_SIZE } from "shared";
 import Search from "@components/Search/Search";
 import DataGrid from "@components/DataGrid/DataGrid";
 import { useDebounceValue } from "@hooks/useDebounce";
-import {
-  useFetchGithubUsersQuery,
-  usePrefetch,
-  // updateQueryData,
-} from "@store/api/githubApi";
+import { useFetchGithubUsersQuery, usePrefetch } from "@store/api/githubApi";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import {
   setSearch,
@@ -46,7 +42,7 @@ export const GithubUsersPage = () => {
 
   const shouldFetch = !!debouncedSearch.trim();
 
-  const { data: queryData, isFetching } = useFetchGithubUsersQuery(
+  const { data, isFetching } = useFetchGithubUsersQuery(
     {
       pageSize: DEFAULT_PAGE_SIZE,
       search: debouncedSearch,
@@ -74,11 +70,11 @@ export const GithubUsersPage = () => {
   useEffect(() => {
     dispatch(
       setGithubUsers({
-        items: queryData?.items || [],
-        total: queryData?.total || 0,
+        items: data?.items || [],
+        total: data?.total || 0,
       })
     );
-  }, [dispatch, queryData]);
+  }, [dispatch, data]);
 
   useEffect(() => {
     if (!shouldFetch) return;

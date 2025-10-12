@@ -16,7 +16,7 @@ const initialState: GithubUsersState = {
 };
 
 export const githubUsersSlice = createSlice({
-  name: "githubUsersResult",
+  name: "githubUsers",
   initialState,
   reducers: {
     setSearch: (state, action) => {

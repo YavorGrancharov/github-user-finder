@@ -8,10 +8,13 @@
     "build": "tsc -b && vite build"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^2.9.0",
     "@tanstack/react-query": "^5.81.5",
+    "github-search-ui": "^0.0.1",
     "icomoon-react": "^3.0.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-redux": "^9.2.0",
     "shared": "^1.0.0",
     "styled-components": "^6.1.19"
   },

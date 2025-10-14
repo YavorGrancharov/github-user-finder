@@ -1,5 +1,5 @@
 import { ChangeEvent, useState } from "react";
-import { Input as SearchInput } from "@ui";
+import { Input as SearchInput } from "github-search-ui";
 
 type SearchProps = {
   onSearch: (search: string) => void;

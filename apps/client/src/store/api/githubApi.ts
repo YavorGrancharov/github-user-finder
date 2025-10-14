@@ -21,7 +21,7 @@ export const githubApi = createApi({
   }),
   refetchOnFocus: false,
   refetchOnMountOrArgChange: true,
-  refetchOnReconnect: false,
+  refetchOnReconnect: true,
 });
 
 export const {

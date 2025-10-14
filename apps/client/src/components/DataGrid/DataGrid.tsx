@@ -1,7 +1,7 @@
 import { DEFAULT_PAGE_SIZE } from "shared";
-import { Grid, Pagination, GridItem } from "@ui";
+import { Grid, Pagination, GridItem } from "github-search-ui";
 import { getInfoMessage } from "./utils";
-import { InfoContainer } from "./DataGrid.styles";
+import InfoMessage from "@components/InfoMessage/InfoMessage";
 
 type DataGridProps = {
   searchTerm: string;
@@ -11,7 +11,6 @@ type DataGridProps = {
   isLoading: boolean;
   onPageChange: (page: number) => void;
   onItemClick: (item: GridItem) => void;
-  withMessage?: boolean;
 };
 
 export const DataGrid = ({
@@ -22,19 +21,16 @@ export const DataGrid = ({
   isLoading,
   onPageChange,
   onItemClick,
-  withMessage = true,
 }: DataGridProps) => {
   const handlePageChange = (page: number) => {
     onPageChange(page);
   };
 
+  const infoMessage = getInfoMessage(isLoading, !!items?.length, !!searchTerm);
+
   return (
     <>
-      {withMessage && (
-        <InfoContainer>
-          {getInfoMessage(isLoading, !!items?.length, !!searchTerm)}
-        </InfoContainer>
-      )}
+      <InfoMessage message={infoMessage} />
       <Grid items={items} onClick={(item) => onItemClick(item)} />
       {items && totalItems > DEFAULT_PAGE_SIZE && (
         <Pagination

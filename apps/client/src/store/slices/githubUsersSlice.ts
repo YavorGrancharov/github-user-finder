@@ -1,37 +1,39 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { GithubUser } from "shared";
 
 export type GithubUsersState = {
-  search: string;
-  currentPage: number;
   items: GithubUser[];
   total: number;
+  isLoading: boolean;
+  error: string | null;
 };
 
 const initialState: GithubUsersState = {
-  search: "",
-  currentPage: 1,
   items: [],
   total: 0,
+  isLoading: false,
+  error: null,
 };
 
 export const githubUsersSlice = createSlice({
   name: "githubUsers",
   initialState,
   reducers: {
-    setSearch: (state, action) => {
-      state.search = action.payload;
+    fetchUsersStart: (state) => {
+      state.isLoading = true;
+      state.error = null;
     },
-    setCurrentPage: (state, action) => {
-      state.currentPage = action.payload;
-    },
-    resetSearch: (state) => {
-      state.search = "";
-      state.currentPage = 1;
-    },
-    setGithubUsers: (state, action) => {
+    fetchUsersSuccess: (
+      state,
+      action: PayloadAction<{ items: GithubUser[]; total: number }>
+    ) => {
       state.items = action.payload.items;
       state.total = action.payload.total;
+      state.isLoading = false;
+    },
+    fetchUsersError: (state, action: PayloadAction<string>) => {
+      state.isLoading = false;
+      state.error = action.payload;
     },
     clearResults: (state) => {
       state.items = [];
@@ -41,10 +43,9 @@ export const githubUsersSlice = createSlice({
 });
 
 export const {
-  setSearch,
-  resetSearch,
-  setCurrentPage,
-  setGithubUsers,
+  fetchUsersStart,
+  fetchUsersSuccess,
+  fetchUsersError,
   clearResults,
 } = githubUsersSlice.actions;
 

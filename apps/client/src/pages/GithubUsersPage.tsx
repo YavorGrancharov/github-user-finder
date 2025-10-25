@@ -1,11 +1,8 @@
 import { useEffect } from "react";
-import { DEFAULT_PAGE_SIZE } from "shared";
 import { DataGrid, Search } from "@components";
 import { useDebounceValue } from "@hooks/useDebounce";
-import { useFetchGithubUsersQuery, usePrefetch } from "@store/api/githubApi";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import {
-  fetchUsersSuccess,
   clearResults,
   fetchUsersStart,
 } from "../store/slices/githubUsersSlice";
@@ -18,6 +15,7 @@ import {
   githubUsersSelector,
   githubUsersTotalSelector,
   searchUsersSelector,
+  shouldFetchUsersSelector,
 } from "../store/selectors/githubUsersSelectors";
 import { openInNewTab } from "./utils";
 import { renderCells } from "./RenderCells";
@@ -27,24 +25,21 @@ import {
   MainTitle,
 } from "./GithubUsersPage.styles";
 
-const SEARCH_RESULTS_QUERY_KEY = "fetchGithubUsers";
-
 export const GithubUsersPage = () => {
   const search = useAppSelector(searchUsersSelector);
   const currentPage = useAppSelector(currentPageSelector);
   const items = useAppSelector(githubUsersSelector);
   const totalItems = useAppSelector(githubUsersTotalSelector);
+  const shouldFetchUsers = useAppSelector(shouldFetchUsersSelector);
   const isLoading = useAppSelector(githubUsersLoadingSelector);
   const error = useAppSelector(githubUsersErrorSelector);
 
-  console.log(error)
-
   const dispatch = useAppDispatch();
 
+  console.log(items, totalItems);
+
   const debouncedSearch = useDebounceValue(search, 1000);
-
-  const shouldFetch = !!debouncedSearch.trim();
-
+  const shouldFetch = shouldFetchUsers;
   const renderItems = renderCells(items || [], search);
 
   const onSearch = (term: string) => {
@@ -69,13 +64,17 @@ export const GithubUsersPage = () => {
     if (shouldFetch) {
       dispatch(fetchUsersStart());
     }
-  }, [debouncedSearch, currentPage, shouldFetch, dispatch]);
+  }, [dispatch, shouldFetch]);
 
   useEffect(() => {
-    if (!shouldFetch) {
+    if (!debouncedSearch.trim()) {
       dispatch(clearResults());
     }
-  }, [dispatch, shouldFetch]);
+  }, [debouncedSearch, dispatch]);
+
+  if (error) {
+    return <div>{error}</div>;
+  }
 
   return (
     <MainContainer>

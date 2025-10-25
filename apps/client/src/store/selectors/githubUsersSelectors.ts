@@ -1,3 +1,4 @@
+import { DEFAULT_PAGE_SIZE } from "shared";
 import { RootState } from "../store";
 
 export const searchUsersSelector = (state: RootState) =>
@@ -17,3 +18,17 @@ export const githubUsersErrorSelector = (state: RootState) =>
 
 export const githubUsersLoadingSelector = (state: RootState) =>
   state.githubUsers.isLoading;
+
+export const githubCacheSelector = (state: RootState) => state.githubCache;
+
+export const shouldFetchUsersSelector = (state: RootState) => {
+  const search = state.githubSearch.search.trim();
+  const currentPage = state.githubPagination.currentPage;
+
+  const cacheKey = `github:users:${search}:${currentPage}:${DEFAULT_PAGE_SIZE}`;
+  const cachedData = state.githubCache[cacheKey];
+
+  console.log("cachedData", cachedData, search.length);
+
+  return search.length > 0 && !cachedData;
+};

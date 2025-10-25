@@ -1,15 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { createEpicMiddleware } from "redux-observable";
 import { setupListeners } from "@reduxjs/toolkit/query";
-import { githubApi } from "./api/githubApi";
 import githubUsersReducer from "./slices/githubUsersSlice";
 import githubSearchReducer from "./slices/githubSearchSlice";
 import githubPaginationReducer from "./slices/githubPaginationSlice";
+import githubCacheReducer from "./slices/githubCacheSlice";
 import githubUsersEpic from "./epics/githubUsersEpic";
-
-const githubApiReducerPath = githubApi.reducerPath;
-const githubApiReducer = githubApi.reducer;
-const githubApiMiddleware = githubApi.middleware;
 
 const epicMiddleware = createEpicMiddleware();
 
@@ -18,10 +14,10 @@ const store = configureStore({
     githubUsers: githubUsersReducer,
     githubSearch: githubSearchReducer,
     githubPagination: githubPaginationReducer,
-    [githubApiReducerPath]: githubApiReducer,
+    githubCache: githubCacheReducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(githubApiMiddleware, epicMiddleware),
+    getDefaultMiddleware().concat(epicMiddleware),
 });
 
 setupListeners(store.dispatch);

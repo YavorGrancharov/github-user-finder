@@ -1,22 +1,14 @@
 import { ofType } from "redux-observable";
-import { debounceTime, switchMap, map, catchError, of, from } from "rxjs";
-import {
-  DEFAULT_PAGE_SIZE,
-  GithubUsersRequest,
-  GithubUsersResponse,
-  MAX_PAGE_SIZE,
-} from "shared";
-import { GithubSearchState, setSearch } from "../slices/githubSearchSlice";
-import {
-  GithubPaginationState,
-  setCurrentPage,
-} from "../slices/githubPaginationSlice";
+import { debounceTime, switchMap, catchError, of, from, merge } from "rxjs";
+import { DEFAULT_PAGE_SIZE, GithubUsersResponse } from "shared";
 import {
   fetchUsersStart,
   fetchUsersSuccess,
   fetchUsersError,
-  GithubUsersState,
-} from "../slices/githubUsersSlice";
+  setCurrentPage,
+  setCache,
+  setSearch,
+} from "../slices";
 import { fetchGithubUsers } from "../api/githubApi";
 import { AppEpic } from "../types";
 
@@ -32,17 +24,46 @@ const githubUsersEpic: AppEpic = ($action, $state) =>
         return of(fetchUsersError("Empty search term"));
       }
 
+      const cacheKey = `github:users:${search}:${currentPage}:${DEFAULT_PAGE_SIZE}`;
+
+      const cachedData = $state.value.githubCache[cacheKey];
+
+      if (cachedData) {
+        console.log(`[CACHE HIT] ${cacheKey}`);
+        return of(
+          fetchUsersSuccess({
+            items: cachedData.items,
+            total: cachedData.total,
+          })
+        );
+      }
+
       return of(fetchUsersStart()).pipe(
         switchMap(() =>
-          fetchGithubUsers({ search, page: currentPage, pageSize: MAX_PAGE_SIZE }).then(
-            (data) =>
-              fetchUsersSuccess({ items: data.items, total: data.total }),
-            (err) => fetchUsersError(err.message)
+          from(
+            fetchGithubUsers({
+              search,
+              page: currentPage,
+              pageSize: DEFAULT_PAGE_SIZE,
+            })
+          ).pipe(
+            switchMap((data: GithubUsersResponse) =>
+              merge(
+                of(
+                  setCache({
+                    key: cacheKey,
+                    items: data.items,
+                    total: data.total,
+                  })
+                ),
+                of(fetchUsersSuccess({ items: data.items, total: data.total }))
+              )
+            ),
+            catchError((err: any) => of(fetchUsersError(err.message)))
           )
-        ),
-        catchError((err) => of(fetchUsersError(err.message)))
+        )
       );
     })
   );
-
+// cache.set<string, GithubUsersResponse>(cacheKey, data);
 export default githubUsersEpic;

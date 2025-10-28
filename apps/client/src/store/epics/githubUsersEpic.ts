@@ -21,7 +21,7 @@ const githubUsersEpic: AppEpic = ($action, $state) =>
       const { currentPage } = $state.value.githubPagination;
 
       if (!search.trim()) {
-        return of(fetchUsersError("Empty search term"));
+        return of(fetchUsersSuccess({ items: [], total: 0 }));
       }
 
       const cacheKey = `github:users:${search}:${currentPage}:${DEFAULT_PAGE_SIZE}`;
@@ -29,7 +29,6 @@ const githubUsersEpic: AppEpic = ($action, $state) =>
       const cachedData = $state.value.githubCache[cacheKey];
 
       if (cachedData) {
-        console.log(`[CACHE HIT] ${cacheKey}`);
         return of(
           fetchUsersSuccess({
             items: cachedData.items,
@@ -65,5 +64,5 @@ const githubUsersEpic: AppEpic = ($action, $state) =>
       );
     })
   );
-// cache.set<string, GithubUsersResponse>(cacheKey, data);
+
 export default githubUsersEpic;

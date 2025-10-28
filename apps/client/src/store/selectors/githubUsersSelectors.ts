@@ -28,7 +28,5 @@ export const shouldFetchUsersSelector = (state: RootState) => {
   const cacheKey = `github:users:${search}:${currentPage}:${DEFAULT_PAGE_SIZE}`;
   const cachedData = state.githubCache[cacheKey];
 
-  console.log("cachedData", cachedData, search.length);
-
   return search.length > 0 && !cachedData;
 };

@@ -1,12 +1,11 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { GithubUser } from "shared";
-
-export type GithubUsersState = {
-  items: GithubUser[];
-  total: number;
-  isLoading: boolean;
-  error: string | null;
-};
+import { createSlice } from "@reduxjs/toolkit";
+import {
+  clearResultsReducer,
+  fetchUsersErrorReducer,
+  fetchUsersStartReducer,
+  fetchUsersSuccessReducer,
+} from "@store/reducers/githubUsersReducer";
+import { GithubUsersState } from "@store/types";
 
 const initialState: GithubUsersState = {
   items: [],
@@ -19,26 +18,10 @@ export const githubUsersSlice = createSlice({
   name: "githubUsers",
   initialState,
   reducers: {
-    fetchUsersStart: (state) => {
-      state.isLoading = true;
-      state.error = null;
-    },
-    fetchUsersSuccess: (
-      state,
-      action: PayloadAction<{ items: GithubUser[]; total: number }>
-    ) => {
-      state.items = action.payload.items;
-      state.total = action.payload.total;
-      state.isLoading = false;
-    },
-    fetchUsersError: (state, action: PayloadAction<string>) => {
-      state.isLoading = false;
-      state.error = action.payload;
-    },
-    clearResults: (state) => {
-      state.items = [];
-      state.total = 0;
-    },
+    fetchUsersStart: fetchUsersStartReducer,
+    fetchUsersSuccess: fetchUsersSuccessReducer,
+    fetchUsersError: fetchUsersErrorReducer,
+    clearResults: clearResultsReducer,
   },
 });
 

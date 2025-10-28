@@ -36,8 +36,6 @@ export const GithubUsersPage = () => {
 
   const dispatch = useAppDispatch();
 
-  console.log(items, totalItems);
-
   const debouncedSearch = useDebounceValue(search, 1000);
   const shouldFetch = shouldFetchUsers;
   const renderItems = renderCells(items || [], search);

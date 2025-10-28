@@ -1,12 +1,6 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { GithubUser } from "shared";
-
-type GithubCacheState = {
-  [key: string]: {
-    items: GithubUser[];
-    total: number;
-  };
-};
+import { createSlice } from "@reduxjs/toolkit";
+import setCacheReducer from "@store/reducers/githubCacheReducer";
+import { GithubCacheState } from "@store/types";
 
 const initialState: GithubCacheState = {
   "": {
@@ -19,15 +13,7 @@ const githubCacheSlice = createSlice({
   name: "githubCache",
   initialState,
   reducers: {
-    setCache(
-      state,
-      action: PayloadAction<{ key: string; items: GithubUser[]; total: number }>
-    ) {
-      state[action.payload.key] = {
-        items: action.payload.items,
-        total: action.payload.total,
-      };
-    },
+    setCache: setCacheReducer,
   },
 });
 

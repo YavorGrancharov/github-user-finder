@@ -1,8 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
-
-export type GithubPaginationState = {
-  currentPage: number;
-};
+import {
+  resetCurrentPageReducer,
+  setCurrentPageReducer,
+} from "@store/reducers/githubPaginationReducer";
+import { GithubPaginationState } from "@store/types";
 
 const initialState: GithubPaginationState = {
   currentPage: 1,
@@ -12,12 +13,8 @@ export const githubPaginationSlice = createSlice({
   name: "githubPagination",
   initialState,
   reducers: {
-    setCurrentPage: (state, action) => {
-      state.currentPage = action.payload;
-    },
-    resetCurrentPage: (state) => {
-      state.currentPage = 1;
-    },
+    setCurrentPage: setCurrentPageReducer,
+    resetCurrentPage: resetCurrentPageReducer,
   },
 });
 

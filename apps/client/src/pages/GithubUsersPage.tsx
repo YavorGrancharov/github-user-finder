@@ -1,22 +1,21 @@
 import { useEffect } from "react";
-import { DEFAULT_PAGE_SIZE } from "shared";
-import Search from "@components/Search/Search";
-import DataGrid from "@components/DataGrid/DataGrid";
+import { DataGrid, Search } from "@components";
 import { useDebounceValue } from "@hooks/useDebounce";
-import { useFetchGithubUsersQuery, usePrefetch } from "@store/api/githubApi";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import {
-  setSearch,
-  setCurrentPage,
-  setGithubUsers,
-  resetSearch,
   clearResults,
+  fetchUsersStart,
 } from "../store/slices/githubUsersSlice";
+import { setSearch, resetSearch } from "../store/slices/githubSearchSlice";
+import { setCurrentPage } from "../store/slices/githubPaginationSlice";
 import {
   currentPageSelector,
+  githubUsersErrorSelector,
+  githubUsersLoadingSelector,
   githubUsersSelector,
   githubUsersTotalSelector,
   searchUsersSelector,
+  shouldFetchUsersSelector,
 } from "../store/selectors/githubUsersSelectors";
 import { openInNewTab } from "./utils";
 import { renderCells } from "./RenderCells";
@@ -26,82 +25,54 @@ import {
   MainTitle,
 } from "./GithubUsersPage.styles";
 
-const SEARCH_RESULTS_QUERY_KEY = "fetchGithubUsers";
-
 export const GithubUsersPage = () => {
   const search = useAppSelector(searchUsersSelector);
   const currentPage = useAppSelector(currentPageSelector);
   const items = useAppSelector(githubUsersSelector);
   const totalItems = useAppSelector(githubUsersTotalSelector);
+  const shouldFetchUsers = useAppSelector(shouldFetchUsersSelector);
+  const isLoading = useAppSelector(githubUsersLoadingSelector);
+  const error = useAppSelector(githubUsersErrorSelector);
 
   const dispatch = useAppDispatch();
 
-  const prefetchGithubUsers = usePrefetch(SEARCH_RESULTS_QUERY_KEY);
-
   const debouncedSearch = useDebounceValue(search, 1000);
-
-  const shouldFetch = !!debouncedSearch.trim();
-
-  const { data, isFetching } = useFetchGithubUsersQuery(
-    {
-      pageSize: DEFAULT_PAGE_SIZE,
-      search: debouncedSearch,
-      page: currentPage,
-    },
-    {
-      skip: !shouldFetch,
-    }
-  );
-
+  const shouldFetch = shouldFetchUsers;
   const renderItems = renderCells(items || [], search);
 
   const onSearch = (term: string) => {
     if (!term.trim()) {
       dispatch(resetSearch());
+      dispatch(clearResults());
       return;
     }
     dispatch(setSearch(term));
+    dispatch(setCurrentPage(1));
   };
 
   const onPageChange = (page: number) => {
     dispatch(setCurrentPage(page));
   };
 
-  useEffect(() => {
-    dispatch(
-      setGithubUsers({
-        items: data?.items || [],
-        total: data?.total || 0,
-      })
-    );
-  }, [dispatch, data]);
+  const onGridCellClick = (cellItem: any) => {
+    openInNewTab(cellItem.html_url);
+  };
 
   useEffect(() => {
-    if (!shouldFetch) return;
-
-    const totalPages = Math.ceil((totalItems || 0) / DEFAULT_PAGE_SIZE);
-    if (currentPage >= totalPages) return;
-
-    const nextPage = currentPage + 1;
-
-    prefetchGithubUsers({
-      pageSize: DEFAULT_PAGE_SIZE,
-      search: debouncedSearch,
-      page: nextPage,
-    });
-  }, [
-    currentPage,
-    totalItems,
-    shouldFetch,
-    prefetchGithubUsers,
-    debouncedSearch,
-  ]);
-
-  useEffect(() => {
-    if (!shouldFetch) {
-      dispatch(clearResults());
+    if (shouldFetch) {
+      dispatch(fetchUsersStart());
     }
   }, [dispatch, shouldFetch]);
+
+  useEffect(() => {
+    if (!debouncedSearch.trim()) {
+      dispatch(clearResults());
+    }
+  }, [debouncedSearch, dispatch]);
+
+  if (error) {
+    return <div>{error}</div>;
+  }
 
   return (
     <MainContainer>
@@ -113,10 +84,10 @@ export const GithubUsersPage = () => {
         searchTerm={debouncedSearch}
         currentPage={currentPage}
         items={renderItems}
-        isLoading={isFetching}
+        isLoading={isLoading}
         totalItems={totalItems || 0}
         onPageChange={onPageChange}
-        onItemClick={(item) => openInNewTab(item.profileUrl)}
+        onItemClick={onGridCellClick}
       />
     </MainContainer>
   );

@@ -1,5 +1,5 @@
 import { GithubUser } from "shared";
-import Highlight from "@components/Highlight/Highlight";
+import { Highlight } from "@components";
 
 export const renderCells = (items: GithubUser[], search: string) => {
   return (

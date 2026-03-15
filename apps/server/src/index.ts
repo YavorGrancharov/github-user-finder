@@ -12,7 +12,7 @@ import { pushMetrics } from "./services/metrics";
 const collectDefaultMetrics = client.collectDefaultMetrics;
 collectDefaultMetrics({ register: client.register });
 
-pushMetrics();
+// pushMetrics();
 
 const pathName = path.join(__dirname, "/../../client/dist");
 

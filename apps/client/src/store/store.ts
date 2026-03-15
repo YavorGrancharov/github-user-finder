@@ -7,8 +7,15 @@ import githubSearchReducer from "./slices/githubSearchSlice";
 import githubPaginationReducer from "./slices/githubPaginationSlice";
 import githubCacheReducer from "./slices/githubCacheSlice";
 import { rootEpic } from "./epics/rootEpic";
+import { AppActions, RootState } from "./types";
 
-const epicMiddleware = createEpicMiddleware();
+export type AppDispatch = typeof store.dispatch;
+
+const epicMiddleware = createEpicMiddleware<
+  AppActions,
+  AppActions,
+  RootState
+>();
 
 const middlewares = [epicMiddleware, logger];
 
@@ -26,8 +33,5 @@ const store = configureStore({
 setupListeners(store.dispatch);
 
 epicMiddleware.run(rootEpic);
-
-export type AppDispatch = typeof store.dispatch;
-export type RootState = ReturnType<typeof store.getState>;
 
 export default store;

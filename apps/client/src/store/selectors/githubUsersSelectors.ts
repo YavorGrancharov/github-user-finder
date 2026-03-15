@@ -1,5 +1,5 @@
+import { RootState } from "@store/types";
 import { DEFAULT_PAGE_SIZE } from "shared";
-import { RootState } from "../store";
 
 export const searchUsersSelector = (state: RootState) =>
   state.githubSearch.search;

@@ -9,7 +9,7 @@ export const fetchUsersStartReducer = (state: GithubUsersState) => {
 
 export const fetchUsersSuccessReducer = (
   state: GithubUsersState,
-  action: PayloadAction<{ items: GithubUser[]; total: number }>
+  action: PayloadAction<{ items: GithubUser[]; total: number }>,
 ) => {
   state.items = action.payload.items;
   state.total = action.payload.total;
@@ -18,7 +18,7 @@ export const fetchUsersSuccessReducer = (
 
 export const fetchUsersErrorReducer = (
   state: GithubUsersState,
-  action: PayloadAction<string>
+  action: PayloadAction<string>,
 ) => {
   state.isLoading = false;
   state.error = action.payload;
